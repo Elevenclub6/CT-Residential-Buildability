@@ -1,88 +1,17 @@
-const towns = [
-  {name:"East Lyme",county:"New London",score:82,pop:"18,760",value:"$390,000",mill:"22.45",open:"22%",strength:"Location, land availability, low risk",metrics:{availability:85,cost:68,environment:80,infrastructure:88,accessibility:90,tax:60,growth:78}},
-  {name:"Killingly",county:"Windham",score:78,pop:"17,900",value:"$315,000",mill:"31.12",open:"18%",strength:"Large parcels, lower land cost",metrics:{availability:88,cost:82,environment:74,infrastructure:67,accessibility:70,tax:58,growth:63}},
-  {name:"Lebanon",county:"New London",score:76,pop:"7,100",value:"$350,000",mill:"26.10",open:"29%",strength:"Affordability, rural character",metrics:{availability:91,cost:79,environment:77,infrastructure:58,accessibility:60,tax:67,growth:62}},
-  {name:"Plainfield",county:"Windham",score:74,pop:"15,400",value:"$305,000",mill:"29.76",open:"17%",strength:"Land availability, low environmental risk",metrics:{availability:86,cost:80,environment:76,infrastructure:64,accessibility:72,tax:56,growth:61}},
-  {name:"Voluntown",county:"New London",score:72,pop:"2,600",value:"$330,000",mill:"25.20",open:"44%",strength:"Large lots, lower taxes",metrics:{availability:83,cost:73,environment:82,infrastructure:48,accessibility:51,tax:74,growth:55}},
-  {name:"Sterling",county:"Windham",score:70,pop:"3,700",value:"$320,000",mill:"30.44",open:"25%",strength:"Affordability, growth potential",metrics:{availability:79,cost:77,environment:72,infrastructure:55,accessibility:58,tax:61,growth:68}},
-  {name:"Canterbury",county:"Windham",score:69,pop:"5,200",value:"$340,000",mill:"28.60",open:"31%",strength:"Rural, available land",metrics:{availability:82,cost:71,environment:75,infrastructure:51,accessibility:55,tax:63,growth:60}},
-  {name:"Scotland",county:"Windham",score:68,pop:"1,700",value:"$335,000",mill:"27.10",open:"36%",strength:"Large parcels, low development constraints",metrics:{availability:80,cost:72,environment:79,infrastructure:46,accessibility:48,tax:65,growth:57}},
-  {name:"Hampton",county:"Windham",score:66,pop:"1,900",value:"$342,000",mill:"27.50",open:"39%",strength:"Affordability, low risk",metrics:{availability:77,cost:70,environment:81,infrastructure:45,accessibility:50,tax:64,growth:52}},
-  {name:"Brooklyn",county:"Windham",score:64,pop:"8,500",value:"$360,000",mill:"28.25",open:"21%",strength:"Land availability, lower taxes",metrics:{availability:75,cost:69,environment:70,infrastructure:60,accessibility:65,tax:62,growth:59}},
-  {name:"Groton",county:"New London",score:61,pop:"38,900",value:"$360,000",mill:"29.50",open:"19%",strength:"Infrastructure, shoreline access",metrics:{availability:52,cost:55,environment:61,infrastructure:91,accessibility:88,tax:52,growth:58}},
-  {name:"Middletown",county:"Middlesex",score:58,pop:"47,000",value:"$355,000",mill:"27.90",open:"16%",strength:"Central access, infrastructure",metrics:{availability:57,cost:58,environment:63,infrastructure:85,accessibility:82,tax:54,growth:56}}
-];
-
-const metricNames = {
-  availability:"Land Availability", cost:"Land Cost", environment:"Environmental Risk",
-  infrastructure:"Infrastructure", accessibility:"Accessibility", tax:"Tax Environment", growth:"Population Growth"
-};
-
-function colorForScore(s){
-  if(s>=81) return "#1fbb73";
-  if(s>=61) return "#71d55b";
-  if(s>=41) return "#e8d34f";
-  if(s>=21) return "#ef8a43";
-  return "#d64050";
-}
-function metricColor(s){return s>=75?"#4de47e":s>=60?"#e6d64d":"#ed8a45"}
-
-function renderRankings(filter=""){
-  const body=document.getElementById("rankingsBody");
-  body.innerHTML="";
-  towns.filter(t=>t.name.toLowerCase().includes(filter.toLowerCase())).forEach((t,i)=>{
-    const tr=document.createElement("tr"); tr.className="rank-row";
-    tr.innerHTML=`<td>${i+1}</td><td><strong>${t.name}</strong></td><td>${t.county}</td>
-      <td><div class="score-pill"><span>${t.score}</span><div class="score-track"><div class="score-fill" style="width:${t.score}%;background:${colorForScore(t.score)}"></div></div></div></td>
-      <td>${t.strength}</td>`;
-    tr.onclick=()=>selectTown(t,tr); body.appendChild(tr);
-  });
-}
-
-function selectTown(t,row){
-  document.querySelectorAll(".rank-row").forEach(r=>r.classList.remove("selected"));
-  if(row) row.classList.add("selected");
-  document.getElementById("townName").textContent=t.name;
-  document.getElementById("townCounty").textContent=t.county+" County";
-  document.getElementById("scoreValue").textContent=t.score;
-  document.getElementById("scoreBadge").textContent=t.score>=81?"Strong Potential":t.score>=61?"Good Potential":"Moderate Potential";
-  document.getElementById("factPopulation").textContent=t.pop;
-  document.getElementById("factValue").textContent=t.value;
-  document.getElementById("factMill").textContent=t.mill;
-  document.getElementById("factOpen").textContent=t.open;
-  document.getElementById("summaryText").textContent=`${t.name} scores well as a preliminary screening candidate based on the current criteria. This is a planning signal only; parcel-level zoning, wetlands, utilities, frontage, soils and local regulations still require detailed research.`;
-  const list=document.getElementById("metricList"); list.innerHTML="";
-  Object.entries(t.metrics).forEach(([k,v])=>{
-    const el=document.createElement("div"); el.className="metric";
-    el.innerHTML=`<span>${metricNames[k]}</span><div class="metric-track"><div class="metric-bar" style="width:${v}%;background:${metricColor(v)}"></div></div><strong>${v}</strong>`;
-    list.appendChild(el);
-  });
-}
-
-function buildMap(){
-  const g=document.getElementById("townCells"); const labels=document.getElementById("cityLabels");
-  const cols=10, rows=6, x0=90,y0=92,w=66,h=54;
-  for(let r=0;r<rows;r++){
-    for(let c=0;c<cols;c++){
-      const base=24 + ((c*9 + r*7 + (c*r)%11) % 72);
-      const x=x0+c*w+(r%2?8:0), y=y0+r*h;
-      const pts=[[x,y],[x+w-4,y+3],[x+w-8,y+h-6],[x+4,y+h]];
-      const p=document.createElementNS("http://www.w3.org/2000/svg","polygon");
-      p.setAttribute("points",pts.map(v=>v.join(",")).join(" "));
-      p.setAttribute("fill",colorForScore(base)); p.setAttribute("class","town-cell");
-      p.addEventListener("click",()=>{const t=towns[(r*cols+c)%towns.length];selectTown(t);});
-      g.appendChild(p);
-    }
-  }
-  const labs=[["Salisbury",145,150],["Torrington",255,205],["Hartford",425,218],["Putnam",650,180],["Waterbury",327,292],["Middletown",456,310],["Norwich",610,330],["New Haven",360,390],["New London",612,406],["Danbury",170,348],["Bridgeport",255,420],["Stamford",115,446]];
-  labs.forEach(([name,x,y])=>{const t=document.createElementNS("http://www.w3.org/2000/svg","text");t.setAttribute("x",x);t.setAttribute("y",y);t.setAttribute("class","map-label");t.textContent=name;labels.appendChild(t);});
-}
-
-document.getElementById("landValue").addEventListener("input",e=>document.getElementById("landValueOut").textContent="$"+Math.round(e.target.value/1000)+"K");
-document.getElementById("searchTown").addEventListener("input",e=>renderRankings(e.target.value));
-document.getElementById("analyzeBtn").addEventListener("click",()=>{
-  const pulse=document.querySelector(".map-card"); pulse.animate([{filter:"brightness(1)"},{filter:"brightness(1.25)"},{filter:"brightness(1)"}],{duration:500});
-});
-document.getElementById("resetBtn").addEventListener("click",()=>location.reload());
-
-buildMap();renderRankings();selectTown(towns[0]);
+const seeds={"East Lyme":82,Killingly:78,Lebanon:76,Plainfield:74,Voluntown:72,Sterling:70,Canterbury:69,Scotland:68,Hampton:66,Brooklyn:64,Groton:61,Middletown:58};let features=[],selected=null,geoLayer,labelLayer,scoreShift=0;
+const map=L.map('map',{zoomControl:true,attributionControl:true}).setView([41.55,-72.68],8);L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:18}).addTo(map);labelLayer=L.layerGroup().addTo(map);
+const hash=s=>[...s].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7);const base=n=>seeds[n]??(42+hash(n)%39);const score=n=>Math.max(10,Math.min(96,base(n)+scoreShift));const color=s=>s>=81?'#16b978':s>=61?'#70d35d':s>=41?'#ecd84f':s>=21?'#ef8541':'#d83247';
+const metrics=n=>{let h=hash(n);return {"Land availability":45+h%48,"Land cost":40+(h>>3)%51,"Environmental fit":42+(h>>6)%48,"Infrastructure":40+(h>>9)%52,"Accessibility":38+(h>>12)%55,"Tax environment":40+(h>>15)%49,"Growth outlook":38+(h>>18)%54}};
+function townName(f){return (f.properties.BASENAME||f.properties.NAME||'Municipality').replace(/ town$/i,'')}
+function style(f){const s=score(townName(f));return {color:'#e8f1f5',weight:selected===f?3:1,fillColor:color(s),fillOpacity:.78}}
+function draw(){if(geoLayer)geoLayer.remove();labelLayer.clearLayers();geoLayer=L.geoJSON({type:'FeatureCollection',features},{style,onEachFeature:(f,l)=>{const n=townName(f);l.bindTooltip(`${n} · ${score(n)}/100`,{sticky:true});l.on('click',()=>select(f));if(document.getElementById('labels').checked){const c=l.getBounds().getCenter();L.marker(c,{interactive:false,icon:L.divIcon({className:'town-label',html:n,iconSize:[90,16],iconAnchor:[45,8]})}).addTo(labelLayer)}}}).addTo(map);map.fitBounds(geoLayer.getBounds(),{padding:[15,15]});renderLists()}
+async function loadMap(){const u='https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/1/query?where=STATE%3D%2709%27&outFields=BASENAME%2CNAME%2CGEOID&returnGeometry=true&outSR=4326&f=geojson';try{const r=await fetch(u);if(!r.ok)throw Error();const g=await r.json();features=g.features.sort((a,b)=>townName(a).localeCompare(townName(b)));draw();document.getElementById('loading').remove()}catch(e){document.getElementById('loading').textContent='Municipal boundary service is temporarily unavailable. Refresh to try again.'}}
+function select(f){selected=f;const n=townName(f),s=score(n),m=metrics(n);document.getElementById('townName').textContent=n;document.getElementById('townSub').textContent='Connecticut municipality · Census GEOID '+(f.properties.GEOID||'—');document.getElementById('score').textContent=s;document.getElementById('summary').textContent=`${n} is ranked as a preliminary screening candidate under the current preferences. The score is a prototype planning signal—not a determination that any parcel is buildable.`;document.getElementById('metrics').innerHTML=Object.entries(m).map(([k,v])=>`<div class="metric"><span>${k}</span><div class="bar"><i style="width:${v}%;background:${color(v)}"></i></div><b>${v}</b></div>`).join('');document.getElementById('facts').innerHTML=`<div><small>Current rank</small><b>#${ranked().findIndex(x=>townName(x)===n)+1}</b></div><div><small>Geometry</small><b>Official boundary</b></div><div><small>Score status</small><b>Prototype</b></div><div><small>Next step</small><b>Parcel research</b></div>`;document.querySelectorAll('#parcels,#profile').forEach(x=>x.disabled=false);draw()}
+function ranked(filter=''){return features.filter(f=>townName(f).toLowerCase().includes(filter.toLowerCase())).sort((a,b)=>score(townName(b))-score(townName(a)))}
+function rows(list){return `<div class="rank head"><span>#</span><span>Municipality</span><span>Score</span><span>Relative result</span></div>`+list.map((f,i)=>{const n=townName(f),s=score(n);return `<div class="rank" data-town="${n}"><span>${i+1}</span><b>${n}</b><span>${s}</span><span class="bar"><i style="width:${s}%;background:${color(s)}"></i></span></div>`}).join('')}
+function renderLists(){document.getElementById('topRankings').innerHTML=rows(ranked().slice(0,10));document.getElementById('fullRankings').innerHTML=rows(ranked(document.getElementById('search').value));document.querySelectorAll('.rank[data-town]').forEach(r=>r.onclick=()=>{const f=features.find(x=>townName(x)===r.dataset.town);showView('map');map.fitBounds(L.geoJSON(f).getBounds(),{maxZoom:11});select(f)});renderCompare()}
+function showView(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(v+'View').classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.view===v));document.querySelector('.table').style.display=v==='map'?'block':'none';if(v==='map')setTimeout(()=>map.invalidateSize(),20)}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showView(b.dataset.view));document.getElementById('budget').oninput=e=>document.getElementById('budgetOut').textContent='$'+Math.round(e.target.value/1000)+'K';document.getElementById('analyze').onclick=()=>{scoreShift=(document.getElementById('budget').value-150000)/25000+(document.getElementById('availability').selectedIndex-1)*3-(document.getElementById('tax').selectedIndex-1)*2;draw()};document.getElementById('reset').onclick=()=>location.reload();document.getElementById('labels').onchange=e=>e.target.checked?draw():labelLayer.clearLayers();document.getElementById('boundaries').onchange=e=>{if(geoLayer)geoLayer.setStyle(f=>({...style(f),weight:e.target.checked?1:0}))};document.getElementById('search').oninput=renderLists;document.getElementById('quickSearch').oninput=e=>{showView('rankings');document.getElementById('search').value=e.target.value;renderLists()};document.getElementById('closeDetail').onclick=()=>{selected=null;document.getElementById('townName').textContent='Select a town';document.getElementById('score').textContent='—';draw()};
+const modal=document.getElementById('modal');document.getElementById('closeModal').onclick=()=>modal.close();document.getElementById('parcels').onclick=()=>openModal('parcels');document.getElementById('profile').onclick=()=>openModal('profile');function openModal(type){const n=townName(selected);document.getElementById('modalBody').innerHTML=type==='parcels'?`<h2>${n}: Candidate Parcel Research</h2><p>This view is now functional as a research workflow. Parcel ranking will activate when parcel/CAMA and constraint layers are connected.</p><ol class="steps"><li>Filter parcels by minimum lot size and assessed land value.</li><li>Remove known flood, wetland, protected-land and steep-slope conflicts.</li><li>Check zoning, frontage, utilities and local regulations.</li><li>Rank surviving parcels and export a due-diligence shortlist.</li></ol><p><b>No candidate parcels are claimed yet.</b> This prevents prototype data from being mistaken for real due diligence.</p>`:`<h2>${n} Municipal Profile</h2><p><b>Prototype score:</b> ${score(n)}/100</p><p><b>Census GEOID:</b> ${selected.properties.GEOID||'—'}</p><p>This profile uses the municipality’s accurate Census boundary. Population, mill rate, zoning, housing values and development rules will appear here as verified sources are connected.</p><p><a href="https://www.google.com/search?q=${encodeURIComponent(n+' Connecticut zoning regulations')}" target="_blank">Research ${n} zoning ↗</a></p>`;modal.showModal()}
+function renderCompare(){const options=ranked().map(f=>`<option>${townName(f)}</option>`).join('');document.getElementById('comparePickers').innerHTML=[0,1,2].map((_,i)=>`<select class="cmp"><option value="">Select town ${i+1}</option>${options}</select>`).join('');document.querySelectorAll('.cmp').forEach(x=>x.onchange=updateComparison)}function updateComparison(){const ns=[...document.querySelectorAll('.cmp')].map(x=>x.value).filter(Boolean);const keys=['Buildability score',...Object.keys(ns[0]?metrics(ns[0]):{})];document.getElementById('comparison').innerHTML=ns.length?`<div class="compareGrid"><b>Metric</b>${ns.map(n=>`<b>${n}</b>`).join('')}${keys.map(k=>`<span>${k}</span>${ns.map(n=>`<strong>${k==='Buildability score'?score(n):metrics(n)[k]}</strong>`).join('')}`).join('')}</div>`:''}
+loadMap();
