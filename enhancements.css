@@ -1,0 +1,5 @@
+#map{background:radial-gradient(circle at center,#11304b,#061522 72%)}
+.leaflet-control-attribution{background:#091827dd!important;color:#829aaf}.leaflet-control-attribution a{color:#64a8ff}
+.compareTable{width:100%;margin-top:25px;border-collapse:collapse}.compareTable th,.compareTable td{padding:14px;text-align:center;border-bottom:1px solid #29465f}.compareTable th:first-child,.compareTable td:first-child{text-align:left;color:#a7bbcd}.compareTable thead th{color:#edf6ff;background:#10243b}.compareScore{font-size:22px;color:#53e78a}
+.editForm{display:grid;grid-template-columns:1fr 1fr;gap:14px}.editForm label{margin:0}.editForm .wide{grid-column:1/-1}.editForm textarea{width:100%;margin-top:7px;padding:10px;border:1px solid #315171;border-radius:7px;background:#10223a;color:white}.editActions{display:flex;gap:10px}.editActions button{flex:1}
+@media(max-width:700px){.editForm{grid-template-columns:1fr}.editForm .wide{grid-column:auto}.compareTable{font-size:12px}.compareTable th,.compareTable td{padding:8px}}
