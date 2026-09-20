@@ -1,24 +1,20 @@
-# CT-Residential-Buildability
+# CT Residential Buildability
 
-A visual prototype for screening Connecticut municipalities for further residential-development research.
+An interactive municipal-level screening prototype for Connecticut residential-development research.
 
-## Current prototype
-- Dark GIS-style dashboard inspired by the concept mockup
-- Adjustable buildability criteria
-- Connecticut municipality heat-map visualization
-- Red-to-green suitability scoring
-- Municipality ranking table
-- Clickable town detail panel with supporting metrics
-- Responsive browser interface
+## Working features
 
-## Important
-The current data and municipal scoring are **illustrative prototype values** intended to validate the interface and interaction design. They are not parcel-level due diligence and should not be used as a final development decision.
+- Accurate Connecticut municipality geometry loaded from the U.S. Census Bureau TIGERweb county-subdivision service
+- Correct town positioning and map tooltips/labels
+- Interactive Map, Rankings, Compare, and About views
+- Clickable municipality polygons and ranking rows
+- Criteria-driven prototype rescoring
+- Functional municipal profile and candidate-parcel research dialogs
 
-## Roadmap
-1. Replace illustrative municipality cells with official Connecticut municipal boundary GeoJSON.
-2. Connect public data for parcels/CAMA, wetlands, flood zones, protected land, roads and municipal attributes.
-3. Create a transparent weighted scoring engine driven by the user's criteria.
-4. Add parcel-level candidate screening inside selected municipalities.
-5. Add exports and saved scenarios.
+## Data status
 
-Open `index.html` locally, or deploy the repository through GitHub Pages.
+Municipal boundaries are authoritative Census geometry. Buildability scores and supporting metrics are still illustrative and must not be used as parcel-level due diligence. The parcel screen intentionally describes the workflow without claiming that unverified parcels are candidates.
+
+## Next data integrations
+
+Connect Connecticut parcel/CAMA, wetlands, flood hazards, protected land, roads, zoning and municipal attributes; then replace prototype scoring with documented weighted calculations.
